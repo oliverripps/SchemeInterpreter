@@ -32,14 +32,12 @@
 
 (define (app-exp proc args)
   (cond [(var-exp? proc) (list proc args)]
-        [(lambda-exp? proc) (list proc args)]
         [else (error 'app-exp "~s is not a procedure" proc)]))
 
 (define (app-exp? exp)
   (cond [(empty? exp) #f]
         [(symbol? (first exp)) #t]
         [(var-exp? (first exp)) #t]
-        [(lambda-exp? (first exp)) #t]
         [else #f]))
 
 (define (app-exp-proc exp)
@@ -79,31 +77,13 @@
 
 (define (let-exp-symbols exp)
   (cond [(let-exp? exp) (second exp)]
-        [else (error 'let-exp-sybols "~s is not a let-exp" exp)]))
+        [else (error 'let-exp? "~s is not a let-exp" exp)]))
 (define (let-exp-bindings exp)
   (cond [(let-exp? exp) (third exp)]
-        [else (error 'let-exp-bindings "~s is not a let-exp" exp)]))
+        [else (error 'let-exp? "~s is not a let-exp" exp)]))
 (define (let-exp-body exp)
   (cond [(let-exp? exp) (fourth exp)]
-        [else (error 'let-exp-body "~s is not a let-exp" exp)]))
-
-(define (lambda-exp exp)
-  (cond [(equal? 'lambda (first exp)) exp]
-        [else (error 'lambda-exp "~s is not a lambda-exp" exp)]))
-        
-(define (lambda-exp? exp)
-  (cond [(empty? exp) #f]
-        [(equal? (first exp) 'lambda) #t]
-        [else #f]))
-
-(define (lambda-exp-parameters exp)
-  (cond [(lambda-exp? exp) (second exp)]
-        [else (error 'lambda-exp-parameters "~s is not a lambda-exp" exp)]))
-(define (lambda-exp-body exp)
-  (cond [(lambda-exp? exp) (third exp)]
-        [else (error 'lambda-exp-body "~s is not a lambda-exp" exp)]))
-
-        
+        [else (error 'let-exp? "~s is not a let-exp" exp)]))
 
 
 
@@ -111,16 +91,16 @@
                          
 
 (define (parse input)
+  (define (parse-error)
+    (error 'parse "Invalid syntax ~s" input))
   (cond [(number? input) (lit-exp input)]
         [(symbol? input) (var-exp input)]
         [(list? input)
          (cond [(empty? input) (parse error)]
                [(cond-exp? input) (cond-exp (list 'if (parse (second input)) (parse (third input)) (parse (fourth input))))]
                [(let-exp? input) (let-exp (list 'let (map first (second input)) (map (lambda (x) (parse x)) (map second (second input))) (parse (third input))))]
-               [(lambda-exp? input) (lambda-exp (list 'lambda (second input) (parse (third input))))]
                [(app-exp? input) (app-exp (parse (first input))
                                           (cond [(equal? (length input) 2) (list (parse (second input)))]
                                                 [(> (length input) 2) (map parse (rest input))]
                                                 [else empty]))])]
-        [else (error 'parse "Invalid syntax ~s" input)]))
-
+        [else (parse-error)]))

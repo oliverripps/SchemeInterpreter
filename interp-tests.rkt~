@@ -39,12 +39,6 @@
                 6)
    (test-equal? "evaluating the first example"
                 (eval-exp '(let (a b) (((var-exp *) ((lit-exp 2) (lit-exp 3))) (lit-exp 24)) (let (c) (((var-exp -) ((var-exp b) (var-exp a)))) ((var-exp *) ((var-exp c) ((var-exp +) ((var-exp a) (var-exp b))))))) test-env)
-                540)
-   (test-equal? "evaluating parsed lambda exp"
-                (eval-exp (parse ((lambda (x) x) 1)) test-env)
-                1)
-   (test-equal? "evaluating parsed let and lambda exp"
-                (eval-exp (parse (let ((sqr (lambda (x) (* x x)))) (let ((cube (lambda (x) (* x (sqr x))))) (cube 3)))) test-env)
-                27)))
+                540)))
 
 (run-tests interp-tests)

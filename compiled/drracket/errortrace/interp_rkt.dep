@@ -1,0 +1,1 @@
+("7.8" racket ("53c51ec9c52988da710110dbcccf5bbbc9e5bc0a" . "26d91f7f5a0cef4c8b24293c30f83eb636bb6aca") #"/Users/Oliver/CS275/f20-hw7-oliverandosama6/env.rkt" #"/Users/Oliver/CS275/f20-hw7-oliverandosama6/parse.rkt" (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))

@@ -2,25 +2,7 @@
 ; Oliver Ripps and Osama Abdelrahman
 
 (require "parse.rkt" "env.rkt")
-
-(define (closure? obj)
-  (cond [(empty? obj) #f]
-        [(equal? (first obj) 'closure) #t]
-        [else #f]))
-(define (closure parameter-list body environment)
-  (cond [(list 'closure parameter-list body environment)]))
-
-(define (closure-params c)
-  (cond [(closure? c) (second c)]
-        [else (error 'closure-params "~s is not a closure" c)]))
-(define (closure-body c)
-  (cond [(closure? c) (third c)]
-        [else (error 'closure-body "~s is not a closure" c)]))
-(define (closure-env c)
-  (cond [(closure? c) (fourth c)]
-        [else (error 'closure-env "~s is not a closure" c)]))
-
-
+  
 (define (prim-proc symb)
   (cond [(symbol? symb) (list 'var-exp symb)]
         [else (error 'prim-proc "~s is not a symbol" symb)]))
@@ -36,7 +18,6 @@
 (define (apply-proc proc args)
   (cond [(prim-proc? proc)
          (apply-primitive-op (prim-proc-op proc) args)]
-        [(closure? proc) (eval-exp (closure-body proc) (env (closure-params proc) args (closure-env proc)))] 
         [else (error 'apply-proc "bad procedure: ~s" proc)]))
 (define (apply-primitive-op op args)
   (cond [(eq? op '+) (apply + args)]
@@ -57,8 +38,12 @@
         [(eq? op 'null?) (if (null? (car args)) 'True 'False)]
         [(eq? op 'list?) (if (list? (car args)) 'True 'False)]
         [(eq? op 'number?) (if (number? (car args)) 'True 'False)]
+        
+        
+        
+        
         [else (error 'apply-primitive-op "Unknown primitive: ~s" op)]))
-(define primitive-operators '(+ - * / negate add1 sub1 list cons car cdr eqv? lt? gt? leq? null? list? number?))
+(define primitive-operators '(+ - * / negate add1 sub1 list cons car cdr eqv? lt? gt? leq?))
 
 (define prim-env
   (env primitive-operators
@@ -78,9 +63,7 @@
         [(let-exp? tree) (eval-exp (fourth tree) (env (second tree)
                                  (map (lambda (x) (eval-exp x e)) (third tree))
                                  e))]
-        [(lambda-exp? tree) (closure (second tree) (third tree) e)]
-        [(app-exp? tree) (apply-proc (eval-exp (app-exp-proc tree) e) (map (lambda (element) (eval-exp element e)) (car (app-exp-args tree))))]
+        [(app-exp? tree) (apply-proc (app-exp-proc tree) (map (lambda (element) (eval-exp element e)) (car (app-exp-args tree))))]
         [else (error 'eval-exp "Invalid tree: ~s" tree)]))
-
 
 (provide (all-defined-out))

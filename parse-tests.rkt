@@ -69,6 +69,15 @@
                (parse '(let ((sqr (lambda (x) (* x x)))) (let ((cube (lambda (x) (* x (sqr x))))) (cube 3))))
                '(let (sqr)
    ((lambda (x) ((var-exp *) ((var-exp x) (var-exp x)))))
-   (let (cube) ((lambda (x) ((var-exp *) ((var-exp x) ((var-exp sqr) ((var-exp x))))))) ((var-exp cube) ((lit-exp 3))))))))
+   (let (cube) ((lambda (x) ((var-exp *) ((var-exp x) ((var-exp sqr) ((var-exp x))))))) ((var-exp cube) ((lit-exp 3))))))
+   (test-equal? "parsing set! expression"
+               (parse '(set! + -))
+               '(set! + (var-exp -)))
+   (test-equal? "parsing set! expression"
+               (parse '(set! + (lambda (x y) (- x (negate y)))))
+               '(set! + (lambda (x y) ((var-exp -) ((var-exp x) ((var-exp negate) ((var-exp y))))))))
+   (test-equal? "parsing set! expression"
+                (parse '(let ([x 1] [y 2]) (begin (set! x 23) (+ x y))))
+                '(let (x y) ((lit-exp 1) (lit-exp 2)) (begin ((set! x (lit-exp 23)) ((var-exp +) ((var-exp x) (var-exp y)))))))))
 
 (run-tests parse-tests)

@@ -3,6 +3,7 @@
 
 (require "parse.rkt" "env.rkt")
 
+
 (define (closure? obj)
   (cond [(empty? obj) #f]
         [(equal? (first obj) 'closure) #t]
@@ -20,7 +21,9 @@
   (cond [(closure? c) (fourth c)]
         [else (error 'closure-env "~s is not a closure" c)]))
 
-
+(define (do-begins tree e last)
+  (cond [(empty? tree) last]
+        [else (do-begins (cdr tree) e (eval-exp (car tree) e))]))
 (define (prim-proc symb)
   (cond [(symbol? symb) (list 'var-exp symb)]
         [else (error 'prim-proc "~s is not a symbol" symb)]))
@@ -79,6 +82,8 @@
                                  (map (lambda (x) (eval-exp x e)) (third tree))
                                  e))]
         [(lambda-exp? tree) (closure (second tree) (third tree) e)]
+        [(set-exp? tree) (set-box! (env-lookup e (set-exp-parameter tree)) (eval-exp (set-exp-binding tree) e))]
+        [(begin-exp? tree) (do-begins (second tree) e empty)]
         [(app-exp? tree) (apply-proc (eval-exp (app-exp-proc tree) e) (map (lambda (element) (eval-exp element e)) (car (app-exp-args tree))))]
         [else (error 'eval-exp "Invalid tree: ~s" tree)]))
 

@@ -103,12 +103,30 @@
   (cond [(lambda-exp? exp) (third exp)]
         [else (error 'lambda-exp-body "~s is not a lambda-exp" exp)]))
 
-        
+(define (set-exp exp)
+  (cond [(equal? 'set! (first exp)) exp]
+        [else (error 'set-exp "~s is not a set-exp" exp)]))
+(define (set-exp? exp)
+  (cond [(empty? exp) #f]
+        [(equal? (first exp) 'set!) #t]
+        [else #f]))
+(define (set-exp-parameter exp)
+  (cond [(set-exp? exp) (second exp)]
+        [else (error 'set-exp-parameter "~s is not a set-exp" exp)]))
+(define (set-exp-binding exp)
+  (cond [(set-exp? exp) (third exp)]
+        [else (error 'set-exp-binding "~s is not a set-exp" exp)]))
 
-
-
-        
-                         
+(define (begin-exp exp)
+  (cond [(equal? 'begin (first exp)) exp]
+        [else (error 'begin-exp "~s is not a begin-exp" exp)]))
+(define (begin-exp? exp)
+  (cond [(empty? exp) #f]
+        [(equal? (first exp) 'begin) #t]
+        [else #f]))
+(define (begin-statements exp)
+  (cond [(begin-exp? exp) (second exp)]
+        [else (error 'begin-statements "~s is not a begin-exp" exp)]))
 
 (define (parse input)
   (cond [(number? input) (lit-exp input)]
@@ -118,6 +136,8 @@
                [(cond-exp? input) (cond-exp (list 'if (parse (second input)) (parse (third input)) (parse (fourth input))))]
                [(let-exp? input) (let-exp (list 'let (map first (second input)) (map (lambda (x) (parse x)) (map second (second input))) (parse (third input))))]
                [(lambda-exp? input) (lambda-exp (list 'lambda (second input) (parse (third input))))]
+               [(set-exp? input) (set-exp (list 'set! (second input) (parse (third input))))]
+               [(begin-exp? input) (begin-exp (list 'begin (map parse (cdr input))))]
                [(app-exp? input) (app-exp (parse (first input))
                                           (cond [(equal? (length input) 2) (list (parse (second input)))]
                                                 [(> (length input) 2) (map parse (rest input))]

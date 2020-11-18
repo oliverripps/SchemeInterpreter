@@ -45,6 +45,21 @@
                 1)
    (test-equal? "evaluating parsed let and lambda exp"
                 (eval-exp (parse (let ((sqr (lambda (x) (* x x)))) (let ((cube (lambda (x) (* x (sqr x))))) (cube 3)))) test-env)
-                27)))
+                27)
+   (test-equal? "changing binding and then evaluating expression"
+                (eval-exp (parse '(+ 2 2)) test-env)
+                4)
+   (eval-exp '(set! + (var-exp -)) test-env)
+   
+   (test-equal? "changing binding and then evaluating expression"
+                (eval-exp (parse '(+ 2 2)) test-env)
+                0)
+   (eval-exp (parse '(set! + (lambda (x y) (- x (negate y))))) test-env)
+   
+   (test-equal? "changing binding and then evaluating expression with begin"
+                (eval-exp (parse '(let ([x 1] [y 2]) (begin (set! x 23) (+ x y)))) test-env)
+                25)
+   ))
+
 
 (run-tests interp-tests)

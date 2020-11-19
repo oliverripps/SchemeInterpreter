@@ -128,6 +128,30 @@
   (cond [(begin-exp? exp) (second exp)]
         [else (error 'begin-statements "~s is not a begin-exp" exp)]))
 
+(define (let-rec? exp)
+  (cond [(empty? exp) #f]
+        [(equal? (first exp) 'letrec) #t]
+        [else #f]))
+
+(define (parse-letrec name value body g)
+  (parse (list 'let (list (list name 0)) (list 'let (list (list g value)) (list 'begin (list 'set! name g) body)))))
+
+(define (maptozero lst)
+  (cond [(empty? (cdr lst)) (list (cons (car lst) (list 0)))]
+        [else (cons (cons (car lst) (list 0)) (maptozero (cdr lst)))]))
+
+(define (maptovals lst lst2)
+  (cond [(empty? (cdr lst)) (list (cons (car lst) (list (car lst2))))]
+        [else (cons (cons (car lst) (list (car lst2))) (maptovals (cdr lst) (cdr lst2)))]))
+
+(define (makebegin names sims body)
+  (append (cons 'begin (map (lambda (x y) (list 'set! x y)) names sims)) (list body)))
+
+(define (parse-letrec* names values body sims)
+  (parse (list 'let (maptozero names) (list 'let (maptovals sims values) (makebegin names sims body)))))
+(define (createsims lst)
+  (cond [(empty? lst) empty]
+        (else (cons (gensym) (createsims (cdr lst))))))
 (define (parse input)
   (cond [(number? input) (lit-exp input)]
         [(symbol? input) (var-exp input)]
@@ -138,9 +162,9 @@
                [(lambda-exp? input) (lambda-exp (list 'lambda (second input) (parse (third input))))]
                [(set-exp? input) (set-exp (list 'set! (second input) (parse (third input))))]
                [(begin-exp? input) (begin-exp (list 'begin (map parse (cdr input))))]
+               [(let-rec? input) (parse-letrec* (map first (second input)) (map second (second input)) (third input) (createsims (map first (second input))))]
                [(app-exp? input) (app-exp (parse (first input))
                                           (cond [(equal? (length input) 2) (list (parse (second input)))]
                                                 [(> (length input) 2) (map parse (rest input))]
                                                 [else empty]))])]
         [else (error 'parse "Invalid syntax ~s" input)]))
-

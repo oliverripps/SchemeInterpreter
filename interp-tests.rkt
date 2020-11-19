@@ -59,7 +59,14 @@
    (test-equal? "changing binding and then evaluating expression with begin"
                 (eval-exp (parse '(let ([x 1] [y 2]) (begin (set! x 23) (+ x y)))) test-env)
                 25)
-   ))
+   (test-equal? "trying letrec with one function"
+                (eval-exp (parse '(letrec ([fac (lambda (x) (if (eqv? x 0) 1 (* x (fac (sub1 x)))))]) (fac 4))) test-env)
+                24)
+   (test-equal? "trying letrec with two functions"
+                (eval-exp (parse '(letrec ([even? (lambda (n) (if (eqv? 0 n) True (odd? (sub1 n))))]  
+             [odd? (lambda (n) (if (eqv? 0 n) False (even? (sub1 n))))] )
+   (even? 5))) test-env)
+                'False)))
 
 
 (run-tests interp-tests)

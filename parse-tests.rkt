@@ -78,6 +78,10 @@
                '(set! + (lambda (x y) ((var-exp -) ((var-exp x) ((var-exp negate) ((var-exp y))))))))
    (test-equal? "parsing set! expression"
                 (parse '(let ([x 1] [y 2]) (begin (set! x 23) (+ x y))))
-                '(let (x y) ((lit-exp 1) (lit-exp 2)) (begin ((set! x (lit-exp 23)) ((var-exp +) ((var-exp x) (var-exp y)))))))))
+                '(let (x y) ((lit-exp 1) (lit-exp 2)) (begin ((set! x (lit-exp 23)) ((var-exp +) ((var-exp x) (var-exp y)))))))
+   (test-true "parsing let-rec expression"
+                (equal? 'let (car (parse '(letrec ([fac (lambda (x) (if (eqv? x 0) 1 (* x (fac (sub1 x)))))]) (fac 4))))))
+
+   ))
 
 (run-tests parse-tests)

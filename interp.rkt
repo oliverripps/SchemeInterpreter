@@ -76,7 +76,7 @@
   (cond [(lit-exp? tree) (lit-exp-num tree)]
         [(var-exp? tree) (unbox (env-lookup e (var-exp-symbol tree)))]
         [(cond-exp? tree) (
-                           cond [(or (equal? 'True (eval-exp (second tree) e)) (not (equal? 0 (eval-exp (second tree) e)))) (eval-exp (third tree) e)]
+                           cond [(or (equal? 'True (eval-exp (second tree) e)) (not (equal? 'False (eval-exp (second tree) e)))) (eval-exp (third tree) e)]
                                 [else (eval-exp (fourth tree) e)])]
         [(let-exp? tree) (eval-exp (fourth tree) (env (second tree)
                                  (map (lambda (x) (eval-exp x e)) (third tree))
@@ -86,5 +86,6 @@
         [(begin-exp? tree) (do-begins (second tree) e empty)]
         [(app-exp? tree) (apply-proc (eval-exp (app-exp-proc tree) e) (map (lambda (element) (eval-exp element e)) (car (app-exp-args tree))))]
         [else (error 'eval-exp "Invalid tree: ~s" tree)]))
+
 
 (provide (all-defined-out))

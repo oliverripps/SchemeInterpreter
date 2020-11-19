@@ -38,7 +38,7 @@
                 '(x y))
 
    (test-equal? "Values accessor"
-                (map unbox (env-vals test-env))
+                (env-vals test-env)
                 '(1 2))
 
    (test-equal? "Previous environment accessor"
@@ -56,13 +56,13 @@
           exn:fail?
           (λ () (env-lookup empty-env 'z)))
    (test-equal? "a is bound to 10"
-                (unbox (env-lookup test-env2 'a))
+                (env-lookup test-env2 'a)
                 10)
    (test-equal? "y is bound to 2 from the original extended environment"
-                (unbox (env-lookup test-env2 'y))
+                (env-lookup test-env2 'y)
                 2)
    (test-equal? "x is bound to 3 after being bound to 1 in the extended environment"
-                (unbox (env-lookup test-env2 'x))
+                (env-lookup test-env2 'x)
                 3)
    (test-exn "Symbol z does not exist in test-env"
           exn:fail?

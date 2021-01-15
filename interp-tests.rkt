@@ -1,5 +1,4 @@
 #lang racket
-; Oliver Ripps and Osama Abdelrahman
 
 (require rackunit rackunit/text-ui rackunit/gui)
 (require "env.rkt" "parse.rkt" "interp.rkt")

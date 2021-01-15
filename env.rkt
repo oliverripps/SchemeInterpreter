@@ -1,5 +1,4 @@
 #lang racket
-; Oliver Ripps and Osama Abdelrahman
 
 (provide env
          env?

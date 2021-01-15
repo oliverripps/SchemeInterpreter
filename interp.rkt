@@ -1,5 +1,4 @@
 #lang racket
-; Oliver Ripps and Osama Abdelrahman
 
 (require "parse.rkt" "env.rkt")
 
